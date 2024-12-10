@@ -20,6 +20,7 @@
     "@angular/platform-browser-dynamic": "~13.1.0",
     "@angular/router": "~13.1.0",
     "bootstrap": "^5.3.3",
+    "nvm": "^0.0.4",
     "recetas-front": "file:",
     "rxjs": "~7.4.0",
     "tslib": "^2.3.0",

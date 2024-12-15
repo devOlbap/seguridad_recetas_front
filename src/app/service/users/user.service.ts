@@ -58,7 +58,10 @@ export class UserService {
 
       this.router.navigate(['/home'])
       return true;
-    },);
+    },(error)=>{
+      // console.log(error);
+      alert('No existe usuario con las credenciales ingresadas.!');
+    });
 
     return true
   }

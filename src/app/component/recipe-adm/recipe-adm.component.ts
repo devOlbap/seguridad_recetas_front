@@ -25,14 +25,13 @@ export class RecipeAdmComponent implements OnInit {
     private router: Router,
     private fb: FormBuilder
   ) {
-    // Validación de autenticación
     this.checkAuthentication();
 
     // this.initializeForms(this.n_receta_form, this.receta_det_form);
     this.n_receta_form = this.fb.group({
       nombre: ['', Validators.required],
       descripcion: ['', Validators.required],
-      idUser: [{value:null, disabled:true}, Validators.required],
+      idUser: [{value:this.userService.id_usuario_log, disabled:true}, Validators.required],
       tipo_cocina: ['', Validators.required],
       pais_origen: ['', Validators.required],
       dificultad: ['', Validators.required],
@@ -75,18 +74,21 @@ export class RecipeAdmComponent implements OnInit {
   onSubmit() {
 
     this.handleFormSubmission(this.n_receta_form, (nuevaReceta:Receta) => {
-      this.recipeService.postRecipe(nuevaReceta).subscribe((response:Receta) => {
-        if(response){
-
-          if(this.recetas.push(response)){
-            this.n_receta_form.reset();
-            this.showAlert('Registrado correctamente');
-            // return true;
+      this.recipeService.postRecipe(nuevaReceta).subscribe(
+        (response:Receta) => {
+          if(response){
+            if(this.recetas.push(response)){
+              this.n_receta_form.reset();
+              this.showAlert('Registrado correctamente');
+              // return true;
+            }
           }
-        }
         // return false;
-
-      });
+        },
+        (error)=>{
+          this.showAlert(error.toString())
+        }
+      );
     });
 
   }
@@ -106,11 +108,11 @@ export class RecipeAdmComponent implements OnInit {
   }
 
 
-  detalleReceta(id: number): void {
-    this.actualiza = true;
+  detalleReceta(id: number| undefined): void {
     if(!id){
       return ;
     }
+    this.actualiza = true;
     this.pk_receta = id;
     this.recipeService.getRecetas(id).subscribe(
       (receta) => {
@@ -126,16 +128,19 @@ export class RecipeAdmComponent implements OnInit {
 
 
   actualizaReceta(): boolean {
-    this.handleFormSubmission(this.receta_det_form, (recetaActualizada) => {
-      if (!this.pk_receta) return false;
-      this.recipeService.updateReceta(recetaActualizada, this.pk_receta).subscribe((response:Receta) => {
-        this.actualiza = false;
-        this.getRecetas();
-        return true;
+    // if(this.receta_det_form.valid){
+      this.handleFormSubmission(this.receta_det_form, (recetaActualizada) => {
+        if (!this.pk_receta) return false;
+        this.recipeService.updateReceta(recetaActualizada, this.pk_receta).subscribe((response:Receta) => {
+          this.actualiza = false;
+          this.getRecetas();
+          return true;
+        });
+        return false;
       });
-      return false;
-    });
-    return true;
+    // }
+    
+    return false;
   }
 
 
@@ -155,18 +160,20 @@ export class RecipeAdmComponent implements OnInit {
     console.error(customMessage || 'Ocurrió un error', error);
     this.showAlert('Ha ocurrido un problema. Inténtalo nuevamente.');
   }
-  private showAlert(message: string): void {
+  showAlert(message: string): void {
     alert(message);
   }
 
-  private checkAuthentication(): void {
+  checkAuthentication(): boolean {
     if (!this.userService.isAuthenticated()) {
       this.router.navigate(['/home']);
+      return false;
     }
+    return true;
   }
-  private initializeForms(n_receta_form:FormGroup, receta_det_form:FormGroup): void {
+  initializeForms(): boolean {
     // this.n_receta_form = this.fb.group({
-    n_receta_form = this.fb.group({
+    this.n_receta_form = this.fb.group({
       nombre: ['', Validators.required],
       descripcion: ['', Validators.required],
       idUser: [{ value: null, disabled: true }, Validators.required],
@@ -177,7 +184,7 @@ export class RecipeAdmComponent implements OnInit {
     });
 
     // this.receta_det_form = this.fb.group({
-    receta_det_form = this.fb.group({
+    this.receta_det_form = this.fb.group({
       nombre: ['', Validators.required],
       descripcion: ['', Validators.required],
       idUser: [{ value: null, disabled: true }, Validators.required],
@@ -186,6 +193,7 @@ export class RecipeAdmComponent implements OnInit {
       dificultad: ['', Validators.required],
       img_ruta: ['', Validators.required]
     });
+    return true;
   }
   // cancelarEdicion() {
   //   this.actualiza = false;

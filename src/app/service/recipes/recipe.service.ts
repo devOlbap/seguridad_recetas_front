@@ -113,22 +113,20 @@ export class RecipeService {
    * @param recipeId ID de la receta a eliminar.
    */
   removeFromCart(recipeId: number): boolean {
-    if (this.idRecipeInCart(recipeId)) {
-      this.carrito = this.carrito.filter(
-        (recipe) => {
-          recipe.id_recipe !== recipeId
-          return true;
-        }
-      );
-      alert('Receta eliminada del carrito');
 
+    if(!this.idRecipeInCart(recipeId)){
       return false;
+    }
 
-    } 
+    this.carrito = this.carrito.filter(
+      (recipe) => {
+        recipe.id_recipe !== recipeId
+        return true;
+      }
+    );
+    alert('Receta eliminada del carrito');
 
-    alert('La receta no existe en el carrito');
-    return false;
-  
+    return true;
   }
 
 

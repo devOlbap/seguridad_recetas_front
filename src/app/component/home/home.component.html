@@ -14,6 +14,9 @@
                     <p class="card-text font-weight-bold">Dificultad: {{receta.dificultad}}</p>
 
                     <button type="button" id="btn_detalle" class="btn btn-outline-success" (click)="verDetalle(receta.id_recipe)"  >Ver Detalle</button>
+                    <button *ngIf="!this.recetaInCart(receta.id_recipe)" type="button" id="btn_add_cart" class="btn btn-outline-info" (click)="addToCart(receta)"  >Agregar al carrito</button>
+                    <button *ngIf="this.recetaInCart(receta.id_recipe)" type="button" id="btn_carrito" class="btn btn-outline-info" routerLink="/recipes" >Ver carrito</button>
+
                 </div>
             </div>
         </div>

@@ -13,7 +13,7 @@ import { User } from 'src/app/model/usuario';
 })
 export class RecipeAdmComponent implements OnInit {
   recetas: Receta[] = [];
-  actualiza = false; 
+  actualiza = false;
   n_receta_form: FormGroup;
   receta_det_form: FormGroup;
 
@@ -26,10 +26,9 @@ export class RecipeAdmComponent implements OnInit {
     private fb: FormBuilder
   ) {
     // Validación de autenticación
-    if (!this.userService.isAuthenticated()) {
-      this.router.navigate(['/home']);
-    }
+    this.checkAuthentication();
 
+    // this.initializeForms(this.n_receta_form, this.receta_det_form);
     this.n_receta_form = this.fb.group({
       nombre: ['', Validators.required],
       descripcion: ['', Validators.required],
@@ -51,76 +50,145 @@ export class RecipeAdmComponent implements OnInit {
     });
   }
 
+  
   ngOnInit(): void {
     this.getRecetas();
   }
 
-  getRecetas(){
-    this.recipeService.getRecetas(undefined)?.subscribe((recipes: any) => {
-      this.recetas = recipes;
-    });
+  getRecetas():boolean{
+    this.recipeService.getRecetas(undefined)?.subscribe(
+      (recipes: any) => {
+        if(recipes.length>0){
+          this.recetas = recipes
+          return true;
+        }
+        return false;
+      },
+      (error) => {
+        this.handleError(error, 'Error fetching recipes')
+        return false;
+      }
+    );
+    return true;
   }
 
   onSubmit() {
-    if (this.n_receta_form.valid) {
-      const nuevaReceta: Receta = this.n_receta_form.value;
 
-      // this.userService.getUserDetail().subscribe((usr)=>{
-      //   console.log(usr);
-      // });
+    this.handleFormSubmission(this.n_receta_form, (nuevaReceta:Receta) => {
+      this.recipeService.postRecipe(nuevaReceta).subscribe((response:Receta) => {
+        if(response){
 
-      this.recipeService.postRecipe(nuevaReceta).subscribe((response) => {
-        this.recetas.push(response);
-        this.n_receta_form.reset(); 
-        alert('Registrado correctamente');  
+          if(this.recetas.push(response)){
+            this.n_receta_form.reset();
+            this.showAlert('Registrado correctamente');
+            // return true;
+          }
+        }
+        // return false;
+
       });
-    }
+    });
+
   }
   deleteReceta(pk:number){
+    if(!pk){
+      return
+    }
     this.recipeService.deleteRecipe(pk).subscribe((response:any)=>{
-      console.log(response)
-      this.getRecetas()
-
-    });
-
-  }
-
-  detalleReceta(id: number) {
-    this.actualiza = true;
-
-    this.pk_receta= id;
-
-    // console.log(id)
-    // return
-
-    this.recipeService.getRecetas(id).subscribe((receta) => {
-      console.log(receta);
-      this.receta_det_form.patchValue(receta);
-    });
-  }
-
-  actualizaReceta() {
-
-
-
-    if (this.receta_det_form.valid) {
-      const recetaActualizada: Receta = this.receta_det_form.value;
-      if(this.pk_receta){
-        this.recipeService.updateReceta(recetaActualizada, this.pk_receta)?.subscribe(() => {
-          this.actualiza = false;
-          this.ngOnInit();
-        });
+      // console.log(response);
+      if(response){
+        this.getRecetas()
       }
-      
+      alert('error');
+
+    });
+
+  }
+
+
+  detalleReceta(id: number): void {
+    this.actualiza = true;
+    if(!id){
+      return ;
+    }
+    this.pk_receta = id;
+    this.recipeService.getRecetas(id).subscribe(
+      (receta) => {
+        if(receta){
+          this.receta_det_form.patchValue(receta)
+        }
+      },
+      (error) =>{
+        this.handleError(error, `No se pudo obtener la receta con ID ${id}`)
+      }
+    );
+  }
+
+
+  actualizaReceta(): boolean {
+    this.handleFormSubmission(this.receta_det_form, (recetaActualizada) => {
+      if (!this.pk_receta) return false;
+      this.recipeService.updateReceta(recetaActualizada, this.pk_receta).subscribe((response:Receta) => {
+        this.actualiza = false;
+        this.getRecetas();
+        return true;
+      });
+      return false;
+    });
+    return true;
+  }
+
+
+  limpiarFormN():boolean {
+    this.n_receta_form.reset();
+    return true
+  }
+  private handleFormSubmission(form: FormGroup, callback: (data: Receta) => void) {
+    if (form.valid) {
+      const receta: Receta = form.getRawValue();
+      callback(receta);
+    } else {
+      console.error('Formulario inválido:', form.errors);
     }
   }
-
-  limpiarFormN() {
-    this.n_receta_form.reset();
+  private handleError(error: any, customMessage?: string): void {
+    console.error(customMessage || 'Ocurrió un error', error);
+    this.showAlert('Ha ocurrido un problema. Inténtalo nuevamente.');
+  }
+  private showAlert(message: string): void {
+    alert(message);
   }
 
-  cancelarEdicion() {
-    this.actualiza = false;
-    this.receta_det_form.reset();
+  private checkAuthentication(): void {
+    if (!this.userService.isAuthenticated()) {
+      this.router.navigate(['/home']);
+    }
   }
+  private initializeForms(n_receta_form:FormGroup, receta_det_form:FormGroup): void {
+    // this.n_receta_form = this.fb.group({
+    n_receta_form = this.fb.group({
+      nombre: ['', Validators.required],
+      descripcion: ['', Validators.required],
+      idUser: [{ value: null, disabled: true }, Validators.required],
+      tipo_cocina: ['', Validators.required],
+      pais_origen: ['', Validators.required],
+      dificultad: ['', Validators.required],
+      img_ruta: ['', Validators.required]
+    });
+
+    // this.receta_det_form = this.fb.group({
+    receta_det_form = this.fb.group({
+      nombre: ['', Validators.required],
+      descripcion: ['', Validators.required],
+      idUser: [{ value: null, disabled: true }, Validators.required],
+      tipo_cocina: ['', Validators.required],
+      pais_origen: ['', Validators.required],
+      dificultad: ['', Validators.required],
+      img_ruta: ['', Validators.required]
+    });
+  }
+  // cancelarEdicion() {
+  //   this.actualiza = false;
+  //   this.receta_det_form.reset();
+  // }
 }

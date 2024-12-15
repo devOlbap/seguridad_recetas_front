@@ -17,7 +17,18 @@ export class LoginComponent {
 
   onSubmit(): void {
 
-    let token = this.usuarioService.login(this.username, this.password)
+    // if(this.username.trim().length == 0 ){
+    //   alert('Debe Ingresar un nombre de usuario');
+    //   return false;
+    // }
+    // if(this.password.trim().length == 0 ){
+    //   alert('Debe ingresar la contraseña');
+    //   return false;
+    // }
+    // this.usuarioService.login(this.username, this.password);
+    // return true;
+    
+    this.usuarioService.login(this.username, this.password)
 
 
     // console.log(this.usuarioService.getToken())

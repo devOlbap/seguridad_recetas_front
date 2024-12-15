@@ -1,7 +1,7 @@
 <app-nav></app-nav>
 
 <div class="container my-5">
-  <h1 class="text-center mb-4">Lista de Recetas</h1>
+  <h1 class="text-center mb-4">Lista de Carrito</h1>
   
   <!-- Tabla de recetas -->
   <table class="table table-bordered table-hover table-responsive">
@@ -20,7 +20,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let receta of recetas">
+      <tr *ngFor="let receta of carrito">
         <td>{{ receta.id_recipe }}</td>
         <td>{{ receta.nombre }}</td>
         <td>{{ receta.fecha_creacion }}</td>
@@ -29,9 +29,11 @@
         <td>{{ receta.tipo_cocina }}</td>
         <td>{{ receta.pais_origen }}</td>
         <td>{{ receta.dificultad }}</td>
-        <td><button type="button" (click)="verReceta(receta.id_recipe)" class="btn btn-success" >Ver</button></td>
+        <td><button type="button" (click)="deleteFromCart(receta.id_recipe)" class="btn btn-danger" >X</button></td>
 
       </tr>
+      
     </tbody>
+      <h5 *ngIf="carrito.length==0"> No existen recetas en tu carrito</h5>
   </table>
 </div>

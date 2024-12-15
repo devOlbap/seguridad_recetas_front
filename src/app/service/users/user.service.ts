@@ -39,23 +39,28 @@ export class UserService {
     return this.id_usuario_log;
   }
 
-  login(username: string, password: string) {
+  login(username: string, password: string) :boolean{
 
-    this.http.post(environment.url_api+'/api/auth/login', { username, password }).subscribe((response: any) => {
-      localStorage.setItem('token', response.token);
+    this.http.post(
+      environment.url_api+'/api/auth/login', 
+      { username, password }
+    ).subscribe((response: any) => {
 
-      this.token = response.token
-
-
-      this.getUserDetail().subscribe((usr)=>{
-        this.id_usuario_log = usr.id_user;
-      });
+      if(response.token){
+        this.setToken(response.token);
+      }
+      
+      this.getUserDetail().subscribe((usr:any)=>{
+        if(usr){
+          this.id_usuario_log = usr.id_user;
+        }
+      },);
 
       this.router.navigate(['/home'])
+      return true;
+    },);
 
-      return response.token;
-    });
-  
+    return true
   }
 
   getUserDetail():Observable<any>{
@@ -82,6 +87,11 @@ export class UserService {
 
   getToken(): string | null {
     return this.token || localStorage.getItem('token'); 
+  }
+
+  setToken(token:string){
+    localStorage.setItem('token', token);
+    this.token = token
   }
 
   delToken(){

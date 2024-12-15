@@ -52,13 +52,16 @@ export class RegisterComponent implements OnInit {
       n_user.roles = ["ADMIN"];
       n_user.estado = true;
 
-      console.log(n_user)
+      // console.log(n_user)
       this.userService.createUser(n_user)?.subscribe((response:any)=>{
-        console.log(response)
+        // console.log(response)
+        alert('Usuario '+response.nombre+' '+response.apellido+' creado correctamente!.');
+        this.n_user.reset(); // Limpiar el formulario
+        this.router.navigate(['/login']);
       })
       // this.recipeService.createReceta(nuevaReceta).subscribe((response) => {
       //   this.recetas.push(response);
-        this.n_user.reset(); // Limpiar el formulario
+      
       // });
     }
       

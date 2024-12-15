@@ -11,9 +11,18 @@ describe('HomeComponent', () => {
   let fixture: ComponentFixture<HomeComponent>;
   let recipeService: jasmine.SpyObj<RecipeService>;
 
+  const bootstrapMock = {
+    Modal: jasmine.createSpy('Modal').and.returnValue({
+      show: jasmine.createSpy('show'),
+      hide: jasmine.createSpy('hide')
+    })
+  };
 
   beforeEach(async () => {
-    recipeService = jasmine.createSpyObj('RecipeService', ['getRecetas']);
+
+    (globalThis as any).bootstrap = bootstrapMock;
+    // recipeService = jasmine.createSpyObj('RecipeService', ['getRecetas']);
+    recipeService = jasmine.createSpyObj('RecipeService', ['getRecetas', 'idRecipeInCart']);
 
     await TestBed.configureTestingModule({
       declarations: [HomeComponent],
@@ -23,6 +32,9 @@ describe('HomeComponent', () => {
 
     fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;
+  });
+  afterEach(() => {
+    delete (globalThis as any).bootstrap;
   });
 
   it('should call getRecetas and update recetas on ngOnInit', () => {
@@ -85,13 +97,46 @@ describe('HomeComponent', () => {
   
   //   component.verDetalle(2);
   
-  //   expect(recipeService.getRecetas).toHaveBeenCalledWith(1);
+  //   expect(recipeService.getRecetas).toHaveBeenCalledWith(2);
   
   //   expect(component.recetaSeleccionada).toEqual(mockReceta);
   
   //   expect(modalShowSpy).toHaveBeenCalled();
   // });
   
+  
+  it('should show a detail when verDetalle is called', () => {
+    const mockReceta = {
+      id_recipe: 2,
+      nombre: 'nombre2',
+      fecha_creacion: '2023',
+      descripcion: 'mi descripcion',
+      autor: 1,
+      tipo_cocina: 1,
+      pais_origen: 1,
+      dificultad: '1',
+      img_ruta: 'https://www.google.com',
+      idUser: 1,
+    };
+  
+    recipeService.idRecipeInCart.and.returnValue(true);
+
+    recipeService.getRecetas.and.returnValue(of(mockReceta));
+  
+    const modalElement = document.createElement('div');
+    modalElement.id = 'detalleModal';
+    document.body.appendChild(modalElement);
+  
+    component.verDetalle(2);
+  
+    expect(recipeService.getRecetas).toHaveBeenCalledWith(2);
+  
+    expect(component.recetaSeleccionada).toEqual(mockReceta);
+  
+    expect(component.detalleModal.show).toHaveBeenCalled();
+  
+    document.body.removeChild(modalElement);
+  });
   
   
 

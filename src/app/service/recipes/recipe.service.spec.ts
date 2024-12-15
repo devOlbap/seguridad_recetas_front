@@ -4,6 +4,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { UserService } from '../users/user.service';
 import { environment } from 'src/environments/environment';
 import { of } from 'rxjs';
+import { Component } from '@angular/core';
 
 describe('RecipeService', () => {
   let service: RecipeService;
@@ -28,13 +29,53 @@ describe('RecipeService', () => {
   afterEach(() => {
     httpMock.verify();
   });
+  
+  it('should add a recipe to the cart',()=>{
+    const m_recipe = { 
+      id_recipe: 1,
+      nombre: 'New Recipe', 
+      descripcion: 'A new recipe', 
+      idUser: 1, 
+      tipo_cocina: 1, 
+      pais_origen: 1, 
+      dificultad: '2', 
+      img_ruta: 'new_recipe.jpg',
+      fecha_creacion: "2020",
+      autor: 1 
+    };
+    expect(service.addCart(m_recipe)).toBeTruthy();
+  });
+
+
 
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
   it('should call getRecetas without pk and return recipes', () => {
-    const mockRecipes = [{ id: 1, name: 'Recipe 1' }, { id: 2, name: 'Recipe 2' }];
+    const mockRecipes = [{ 
+      id_recipe: 1,
+      nombre: 'New Recipe', 
+      descripcion: 'A new recipe', 
+      idUser: 1, 
+      tipo_cocina: 1, 
+      pais_origen: 1, 
+      dificultad: '2', 
+      img_ruta: 'new_recipe.jpg',
+      fecha_creacion: "2020",
+      autor: 1 
+    }, { 
+      id_recipe: 2,
+      nombre: 'New Recipe2', 
+      descripcion: 'A new recipe2', 
+      idUser: 2, 
+      tipo_cocina: 2, 
+      pais_origen: 2, 
+      dificultad: '2', 
+      img_ruta: 'new_recipe2.jpg',
+      fecha_creacion: "2020",
+      autor: 2 
+    }];
     userService.getToken.and.returnValue('fake-token');
 
     service.getRecetas(undefined).subscribe(recipes => {
@@ -48,7 +89,18 @@ describe('RecipeService', () => {
   });
 
   it('should call getRecetas with pk and return a single recipe', () => {
-    const mockRecipe = { id: 1, name: 'Recipe 1' };
+    const mockRecipe = { 
+      id_recipe: 1,
+      nombre: 'New Recipe', 
+      descripcion: 'A new recipe', 
+      idUser: 1, 
+      tipo_cocina: 1, 
+      pais_origen: 1, 
+      dificultad: '2', 
+      img_ruta: 'new_recipe.jpg',
+      fecha_creacion: "2020",
+      autor: 1 
+    };
     const pk = 1;
     userService.getToken.and.returnValue('fake-token');
 
@@ -60,6 +112,22 @@ describe('RecipeService', () => {
     expect(req.request.method).toBe('GET');
     expect(req.request.headers.get('Authorization')).toBe('Bearer fake-token');
     req.flush(mockRecipe);
+  });
+
+  it('should remove a recipe from the cart',()=>{
+    service.addCart({ 
+      id_recipe: 1,
+      nombre: 'New Recipe', 
+      descripcion: 'A new recipe', 
+      idUser: 1, 
+      tipo_cocina: 1, 
+      pais_origen: 1, 
+      dificultad: '2', 
+      img_ruta: 'new_recipe.jpg',
+      fecha_creacion: "2020",
+      autor: 1 
+    })
+    expect(service.removeFromCart(1)).toBeFalsy();
   });
 
   it('should call postRecipe and create a recipe', () => {

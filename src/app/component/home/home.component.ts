@@ -36,12 +36,30 @@ export class HomeComponent implements OnInit {
 
   getRecetas(){
     this.recipeService.getRecetas(undefined)?.subscribe((recipes:any)=>{
-      this.recetas= recipes;
+      if(recipes.length > 0 ){
+        this.recetas= recipes;
+        return
+      }
     });
   }
   getRecetaById(pk:number){
 
   }
+
+  addToCart(receta:any){
+    this.recipeService.addCart(receta);
+  }
+
+  recetaInCart(pk:number):Boolean{
+
+    return this.recipeService.idRecipeInCart(pk);
+    // if(this.recipeService.idRecipeInCart(pk)){
+    //   return true;
+    // }
+    // return false;
+  }
+
+
 
   recetaSeleccionada: any;
 

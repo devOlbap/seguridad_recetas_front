@@ -50,40 +50,91 @@ describe('RecipeAdmComponent', () => {
     expect(component.getRecetas).toHaveBeenCalled(); 
   });
 
-  // it('should add a new receta when form is valid and submit is called', () => {
-  //   const newReceta: any = { 
-  //     // id_recipe:1,
+  // it('should get a recipe',()=>{
+  //   const mockResponse = [{ 
+  //     id_recipe: 1,
   //     nombre: 'New Recipe', 
   //     descripcion: 'A new recipe', 
   //     idUser: 1, 
   //     tipo_cocina: 1, 
   //     pais_origen: 1, 
   //     dificultad: '2', 
-  //     img_ruta: 'new_recipe.jpg' ,
-  //     // fecha_creacion:"2020",
-  //     // autor:1
-  //   };
-
-  //   component.n_receta_form.setValue(newReceta); 
-  //   recipeService.postRecipe.and.returnValue(of({ 
-  //     id_recipe:1,
+  //     img_ruta: 'new_recipe.jpg', 
+  //     fecha_creacion: "2020",
+  //     autor: 1 
+  //   },{ 
+  //     id_recipe: 2,
   //     nombre: 'New Recipe', 
   //     descripcion: 'A new recipe', 
-  //     idUser: 1, 
-  //     tipo_cocina: 1, 
-  //     pais_origen: 1, 
+  //     idUser: 2,   
+  //     tipo_cocina: 2, 
+  //     pais_origen: 2, 
   //     dificultad: '2', 
-  //     img_ruta: 'new_recipe.jpg' ,
-  //     fecha_creacion:"2020",
-  //     autor:1
-  //   })); 
+  //     img_ruta: 'new_recipe.jpg', 
+  //     fecha_creacion: "2020",
+  //     autor: 2 
+  //   }];
 
-  //   spyOn(window, 'alert'); 
+  //   component.getRecetas();
 
-  //   component.onSubmit();
-  //   expect(recipeService.postRecipe).toHaveBeenCalledWith(newReceta); 
-  //   expect(window.alert).toHaveBeenCalledWith('Registrado correctamente'); 
-  // });
+  //   expect(component.getRecetas()).toHaveBeenCalledWith(undefined);
+  //   expect(recipeService.getRecetas.and.returnValue(of(mockResponse))).toBeTruthy()
+  //   expect(component.getRecetas()).toBeTruthy();
+
+
+  // })
+
+  it('should add a new receta when form is valid and submit is called', () => {
+    const newReceta = { 
+      nombre: 'New Recipe', 
+      descripcion: 'A new recipe', 
+      idUser: 1, 
+      tipo_cocina: 1, 
+      pais_origen: 1, 
+      dificultad: '2', 
+      img_ruta: 'new_recipe.jpg'
+    };
+  
+    component.n_receta_form.setValue(newReceta);
+  
+    const mockResponse = { 
+      id_recipe: 1,
+      ...newReceta, 
+      fecha_creacion: "2020",
+      autor: 1 
+    };
+    recipeService.postRecipe.and.returnValue(of(mockResponse));
+  
+    spyOn(window, 'alert');
+  
+    component.onSubmit();
+  
+    expect(recipeService.postRecipe).toHaveBeenCalledWith(newReceta);
+  
+    expect(window.alert).toHaveBeenCalledWith('Registrado correctamente');
+  });
+
+  it('should reset the form',()=>{
+    const newReceta = { 
+      nombre: 'New Recipe', 
+      descripcion: 'A new recipe', 
+      idUser: 1, 
+      tipo_cocina: 1, 
+      pais_origen: 1, 
+      dificultad: '2', 
+      img_ruta: 'new_recipe.jpg'
+    };
+  
+    component.n_receta_form.setValue(newReceta);
+
+    expect(component.limpiarFormN()).toBeTruthy();
+  });
+
+  it('should update the selected  recipe',()=>{
+    expect(component.actualizaReceta()).toBeTruthy();
+  });
+
+  
 
   it('should delete a receta and call getRecetas after delete', () => {
     const recetaId = 1;
@@ -121,4 +172,6 @@ describe('RecipeAdmComponent', () => {
     expect(recipeService.getRecetas).toHaveBeenCalledWith(recetaId); 
     expect(component.receta_det_form.value).toEqual(recetaDetails); 
   });
+
+
 });

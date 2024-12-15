@@ -11,7 +11,7 @@ import { UserService } from 'src/app/service/users/user.service';
 })
 export class RecipesComponent implements OnInit {
 
-  recetas: Receta[] = [];
+  carrito: Receta[] = [];
 
   constructor(
     private recipeService: RecipeService,
@@ -20,25 +20,12 @@ export class RecipesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.router.navigate(['/home']);
-
-    this.recipeService.getRecetas(undefined)?.subscribe((recipes:any)=>{
-      this.recetas= recipes;
-    })
-
-
-
-    // this.dataService.getRecetas().subscribe(
-    //   (data: Receta[]) => {
-    //     this.recetas = data;
-    //   },
-    //   (error) => {
-    //     console.error('Error al cargar los datos:', error);
-    //   }
-    // );
+    this.carrito = this.recipeService.getCarrito();
   }
 
-  verReceta(id:number){
-    console.log(id)
+  deleteFromCart(pk:number){
+    this.recipeService.removeFromCart(pk);
+    this.ngOnInit();
   }
+
 }

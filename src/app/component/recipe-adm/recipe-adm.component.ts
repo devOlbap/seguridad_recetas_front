@@ -97,11 +97,10 @@ export class RecipeAdmComponent implements OnInit {
       return
     }
     this.recipeService.deleteRecipe(pk).subscribe((response:any)=>{
-      // console.log(response);
       if(response){
         this.getRecetas()
+        this.showAlert('Eliminado correctamente!')
       }
-      alert('error');
 
     });
 

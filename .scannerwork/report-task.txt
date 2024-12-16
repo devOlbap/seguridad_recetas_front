@@ -1,6 +1,6 @@
-projectKey=front
+projectKey=front_1234
 serverUrl=http://localhost:9000
 serverVersion=9.9.8.100196
-dashboardUrl=http://localhost:9000/dashboard?id=front
-ceTaskId=AZOt-PSOIvk4lwBtoGvZ
-ceTaskUrl=http://localhost:9000/api/ce/task?id=AZOt-PSOIvk4lwBtoGvZ
+dashboardUrl=http://localhost:9000/dashboard?id=front_1234
+ceTaskId=AZPMjY0C4BwWny2EXUEd
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AZPMjY0C4BwWny2EXUEd
